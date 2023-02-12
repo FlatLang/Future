@@ -1,0 +1,11 @@
+package flat/future
+
+import flat/future/Future
+
+testable class {
+  test `can create`() {
+    let value = Future()
+
+    expect(value).toNotBe(null)
+  }
+}
