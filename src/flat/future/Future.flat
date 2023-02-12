@@ -1,4 +1,9 @@
 package flat/future
 
-class {
+class<TType> {
+  public construct(
+    async func(resolve(TType value), reject(Exception exception))
+  ) {}
+
+  public async get() -> TType => null
 }

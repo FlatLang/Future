@@ -1,0 +1,19 @@
+package flat/future
+
+class<TType> {
+  native var Object promiseValue
+
+  public construct(
+    func(resolve(TType value), reject(Exception exception))
+  ) {
+    external {
+      #{promiseValue} = new Promise(#{func});
+    }
+  }
+
+  public async get() -> TType {
+    external {
+      return await #{promiseValue};
+    }
+  }
+}
