@@ -4,10 +4,10 @@ import flat/test/TestResult
 
 import flat/time/Timer
 import flat/io/FancyOutputStream
-import flat/future/Future
 
 [TestSuite [
-  Future_Test
+  Future_Test,
+  CompletableFuture_Test
 ]]
 class {
   public static async main(String[] args) {

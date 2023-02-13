@@ -1,0 +1,3 @@
+package flat/future
+
+class extends Exception {}

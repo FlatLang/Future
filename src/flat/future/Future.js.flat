@@ -2,18 +2,65 @@ package flat/future
 
 class<TType> {
   native var Object promiseValue
+  native var Object resolveFunc
+  native var Object rejectFunc
 
-  public construct(
-    func(resolve(TType value), reject(Exception exception))
-  ) {
+  construct() {
     external {
-      #{promiseValue} = new Promise(#{func});
+      #{promiseValue} = new Promise((resolve, reject) => {
+        #{resolveFunc} = resolve;
+        #{rejectFunc} = reject;
+      });
     }
   }
 
   public async get() -> TType {
     external {
-      return await #{promiseValue};
+      return #{promiseValue}
+        .then((data) => {
+          if (#{cancelled}) {
+            #{throw CancellationException()};
+          }
+
+          return data;
+        })
+        .catch((err) => {
+          if (#{cancelled}) {
+            #{throw CancellationException()};
+          }
+
+          return err;
+        });
+    }
+  }
+
+  public static create<TType>(async func() -> TType) -> Future<TType> {
+    let future = Future()
+
+    external {
+      (async () => {
+        try {
+          #{future.resolveFunc}(await func());
+        } catch (e) {
+          #{future.rejectFunc}(e);
+        }
+      })();
+    }
+
+    return future
+  }
+
+  public static class CompletableFuture<TType> extends Future<TType> {
+    public complete(TType value) => value {
+      external {
+        #{resolveFunc}(#{value});
+      }
+    }
+
+    public error(Exception value) => value {
+      external {
+        #{rejectFunc}(#{value});
+      }
     }
   }
 }
