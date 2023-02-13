@@ -14,7 +14,11 @@ class<TType> {
     throw Exception("Not implemented for target language or runtime")
   }
 
-  public static create<TType>(async func() -> TType) -> Future<TType> {
+  public static from<TType>(async func() -> TType) -> Future<TType> {
+    throw Exception("Not implemented for target language or runtime")
+  }
+
+  public static fromResolve<TType>(async func(resolve(TType value), reject(Exception exception))) -> Future<TType> {
     throw Exception("Not implemented for target language or runtime")
   }
 

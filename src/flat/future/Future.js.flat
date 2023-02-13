@@ -34,7 +34,7 @@ class<TType> {
     }
   }
 
-  public static create<TType>(async func() -> TType) -> Future<TType> {
+  public static from<TType>(async func() -> TType) -> Future<TType> {
     let future = Future()
 
     external {
@@ -46,6 +46,17 @@ class<TType> {
         }
       })();
     }
+
+    return future
+  }
+
+  public static fromResolve<TType>(async func(resolve(TType value), reject(Exception exception))) -> Future<TType> {
+    let future = Future()
+
+    let res(TType value) = future.resolveFunc
+    let rej(Exception exception) = future.rejectFunc
+
+    func(res, rej)$
 
     return future
   }
