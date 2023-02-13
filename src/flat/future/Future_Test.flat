@@ -63,4 +63,40 @@ testable class {
     expect(end - start >= 90).toBe(true)
     expect(response).toBe("hey")
   }
+
+  async test `Future.cancel: does not throw CancellationException when get is not called`() {
+    let future = Future.fromResolve(async {
+      Thread.sleep(100)
+      _resolve("hey")
+    })
+
+    expect({ future.cancel() }).toNotThrow(CancellationException.class)
+  }
+
+  async test `Future.cancel: does throw CancellationException when get is called after a future is cancelled`() {
+    let future = Future.fromResolve(async {
+      Thread.sleep(100)
+      _resolve("hey")
+    })
+
+    future.cancel()
+
+    expectAsync(async { future.get() }).toThrow(CancellationException.class)
+  }
+
+  async test `Future.cancel: does not throw CancellationException when get is not called when future is already completed`() {
+    let future = Future.create()
+    future.complete("hey")
+
+    expect({ future.cancel() }).toNotThrow(CancellationException.class)
+  }
+
+  async test `Future.cancel: does throw CancellationException when get is called after a future is cancelled when future is already completed`() {
+    let future = Future.create()
+    future.complete("hey")
+
+    future.cancel()
+
+    expectAsync(async { future.get() }).toThrow(CancellationException.class)
+  }
 }

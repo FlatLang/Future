@@ -34,6 +34,14 @@ class<TType> {
     }
   }
 
+  public cancel() {
+    cancelled = true
+
+    external {
+      #{resolveFunc}();
+    }
+  }
+
   public static from<TType>(async func() -> TType) -> Future<TType> {
     let future = Future()
 
