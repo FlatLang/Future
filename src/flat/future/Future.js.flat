@@ -18,6 +18,8 @@ class<TType> {
     external {
       return #{promiseValue}
         .then((data) => {
+          #{completed = true};
+
           if (#{cancelled}) {
             #{throw CancellationException()};
           }
@@ -25,6 +27,8 @@ class<TType> {
           return data;
         })
         .catch((err) => {
+          #{completed = true};
+
           if (#{cancelled}) {
             #{throw CancellationException()};
           }
@@ -35,6 +39,7 @@ class<TType> {
   }
 
   public cancel() {
+    completed = true
     cancelled = true
 
     external {

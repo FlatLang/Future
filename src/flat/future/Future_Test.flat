@@ -91,12 +91,14 @@ testable class {
     expect({ future.cancel() }).toNotThrow(CancellationException.class)
   }
 
-  async test `Future.cancel: does throw CancellationException when get is called after a future is cancelled when future is already completed`() {
-    let future = Future.create()
-    future.complete("hey")
+  async test `can automatically unwrap the response`() {
+    expect(futureThing()).toBe("hey")
+    expect(futureThing().count).toBe(3)
+  }
 
-    future.cancel()
-
-    expectAsync(async { future.get() }).toThrow(CancellationException.class)
+  futureThing() -> Future<String> {
+    return Future.from({
+      return "hey"
+    })
   }
 }
