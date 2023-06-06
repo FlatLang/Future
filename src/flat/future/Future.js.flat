@@ -1,90 +1,90 @@
 package flat/future
 
 class<TType> {
-  native var Object promiseValue
-  native var Object resolveFunc
-  native var Object rejectFunc
+    native var Object promiseValue
+    native var Object resolveFunc
+    native var Object rejectFunc
 
-  construct() {
-    external {
-      #{promiseValue} = new Promise((resolve, reject) => {
-        #{resolveFunc} = resolve;
-        #{rejectFunc} = reject;
-      });
-    }
-  }
-
-  public async get() -> TType {
-    external {
-      return #{promiseValue}
-        .then((data) => {
-          #{completed = true};
-
-          if (#{cancelled}) {
-            #{throw CancellationException()};
-          }
-
-          return data;
-        })
-        .catch((err) => {
-          #{completed = true};
-
-          if (#{cancelled}) {
-            #{throw CancellationException()};
-          }
-
-          return err;
-        });
-    }
-  }
-
-  public cancel() {
-    completed = true
-    cancelled = true
-
-    external {
-      #{resolveFunc}();
-    }
-  }
-
-  public static from<TType>(async func() -> TType) -> Future<TType> {
-    let future = Future()
-
-    external {
-      (async () => {
-        try {
-          #{future.resolveFunc}(await func());
-        } catch (e) {
-          #{future.rejectFunc}(e);
+    construct() {
+        external {
+            #{promiseValue} = new Promise((resolve, reject) => {
+                #{resolveFunc} = resolve;
+                #{rejectFunc} = reject;
+            });
         }
-      })();
     }
 
-    return future
-  }
+    public async get() -> TType {
+        external {
+            return #{promiseValue}
+                .then((data) => {
+                    #{completed = true};
 
-  public static fromResolve<TType>(async func(resolve(TType value), reject(Exception exception))) -> Future<TType> {
-    let future = Future()
+                    if (#{cancelled}) {
+                        #{throw CancellationException()};
+                    }
 
-    let res(TType value) = future.resolveFunc
-    let rej(Exception exception) = future.rejectFunc
+                    return data;
+                })
+                .catch((err) => {
+                    #{completed = true};
 
-    func(res, rej)$
+                    if (#{cancelled}) {
+                        #{throw CancellationException()};
+                    }
 
-    return future
-  }
-
-  public static class CompletableFuture<TType> extends Future<TType> {
-    public complete(TType value) => value {
-      external {
-        #{resolveFunc}(#{value});
-      }
+                    return err;
+                });
+        }
     }
 
-    public error(Exception value) => value {
-      external {
-        #{rejectFunc}(#{value});
-      }
+    public cancel() {
+        completed = true
+        cancelled = true
+
+        external {
+            #{resolveFunc}();
+        }
     }
-  }
+
+    public static from<TType>(async func() -> TType) -> Future<TType> {
+        let future = Future()
+
+        external {
+            (async () => {
+                try {
+                    #{future.resolveFunc}(await func());
+                } catch (e) {
+                    #{future.rejectFunc}(e);
+                }
+            })();
+        }
+
+        return future
+    }
+
+    public static fromResolve<TType>(async func(resolve(TType value), reject(Exception exception))) -> Future<TType> {
+        let future = Future()
+
+        let res(TType value) = future.resolveFunc
+        let rej(Exception exception) = future.rejectFunc
+
+        func(res, rej)$
+
+        return future
+    }
+
+    public static class CompletableFuture<TType> extends Future<TType> {
+        public complete(TType value) => value {
+            external {
+                #{resolveFunc}(#{value});
+            }
+        }
+
+        public error(Exception value) => value {
+            external {
+                #{rejectFunc}(#{value});
+            }
+        }
+    }
 }
