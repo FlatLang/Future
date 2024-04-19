@@ -1,8 +1,11 @@
 package flat/future
 
 class<TType> {
+    Array<action(Exception)> exceptionListeners = Array()
+
     visible var Bool completed
     visible var Bool cancelled
+    visible var Exception exception
 
     construct() {}
 
@@ -12,6 +15,10 @@ class<TType> {
 
     public cancel() {
         throw Exception("Not implemented for target language or runtime")
+    }
+
+    public onException(func(Exception)) {
+        exceptionListeners.add(func)
     }
 
     public static from<TType>(async func() -> TType) -> Future<TType> {

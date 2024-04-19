@@ -10,31 +10,42 @@ class<TType> {
             #{promiseValue} = new Promise((resolve, reject) => {
                 #{resolveFunc} = resolve;
                 #{rejectFunc} = reject;
+            }).catch((e) => {
+                #{exception} = e;
+                #{exceptionOccurred()};
             });
         }
     }
 
+    exceptionOccurred() {
+        exceptionListeners.forEach({
+          _(exception)
+        })
+    }
+
     public async get() -> TType {
+        if (exception) {
+            throw exception
+        }
         external {
-            return #{promiseValue}
-                .then((data) => {
-                    #{completed = true};
+            try {
+                let data = await #{promiseValue};
+                #{completed = true};
 
-                    if (#{cancelled}) {
-                        #{throw CancellationException()};
-                    }
+                if (#{cancelled}) {
+                    #{throw CancellationException()};
+                }
 
-                    return data;
-                })
-                .catch((err) => {
-                    #{completed = true};
+                return data;
+            } catch (err) {
+                #{completed = true};
 
-                    if (#{cancelled}) {
-                        #{throw CancellationException()};
-                    }
+                if (#{cancelled}) {
+                    #{throw CancellationException()};
+                }
 
-                    return err;
-                });
+                return err;
+            }
         }
     }
 
